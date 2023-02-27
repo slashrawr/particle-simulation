@@ -1,9 +1,9 @@
-int seed = 354427;
+int seed = 212127;
 
 int maxParticles = 3000;
 Particle[] particles;
 
-float attracRepel11 = 1;
+float attracRepel11 = -1;
 float attracRepel12 = 1;
 float attracRepel13 = -1;
 float attracRepel14 = 1;
@@ -12,7 +12,7 @@ float attracRepel22 = 1;
 float attracRepel23 = -1;
 float attracRepel24 = 1;
 float attracRepel31 = -1;
-float attracRepel32 = 1;
+float attracRepel32 = -1;
 float attracRepel33 = -1;
 float attracRepel34 = -1;
 float attracRepel41 = -1;
@@ -20,21 +20,21 @@ float attracRepel42 = -1;
 float attracRepel43 = -1;
 float attracRepel44 = -1;
 
-float force11 = 2.66f;
-float force12 = 1.61f;
+float force11 = 0.66f;
+float force12 = 10.61f;
 float force13 = 0.1f;
-float force14 = 3.32f;
-float force21 = 4.1f;
+float force14 = 0.32f;
+float force21 = 10.1f;
 float force22 = 0.76f;
-float force23 = 0.62f;
+float force23 = 100.62f;
 float force24 = 1.2f;
-float force31 = 4.54f;
-float force32 = 30.51f;
-float force33 = 3.51f;
-float force34 = 30.5f;
+float force31 = 0.54f;
+float force32 = 10.51f;
+float force33 = 0.51f;
+float force34 = 0.5f;
 float force41 = 0.63f;
 float force42 = 10.7f;
-float force43 = 10.4;
+float force43 = 0.4;
 float force44 = 0.3;
 
 //Global for performance
@@ -70,10 +70,10 @@ void setup() {
     {3,4,5,6,7,8},
     {4,5,7,8}};
   
-  float p1Size = random(2,5);
-  float p2Size = random(2,5);
-  float p3Size = random(2,5);
-  float p4Size = random(2,5);
+  float p1Size = random(3,6);
+  float p2Size = random(3,6);
+  float p3Size = random(3,6);
+  float p4Size = random(3,6);
   
   float p1ForceRadius = random(100,180);
   float p2ForceRadius = random(100,180);
@@ -109,7 +109,7 @@ void setup() {
     }
   }
   
-  
+  //noLoop();
 }
 
 void draw() {
@@ -149,7 +149,7 @@ class Particle {
   }
   
   void calcMotion() {
-    checkSector();
+    
     getNearParticles();
     PVector force = zeroVector.copy();
   
@@ -160,6 +160,7 @@ class Particle {
     this.velocity.add(force).mult(0.5);
     this.checkBounds();
     this.position.add(this.velocity);
+    this.checkSector();
   }
   
   void getNearParticles() {
@@ -186,11 +187,9 @@ class Particle {
   
   void checkParticleDistance(Particle otherParticle) {
     
-    
     if (this.id == otherParticle.id)
       return;
    
-    
     float d = this.position.dist(otherParticle.position);
     if (otherParticle.forceRadius > d) {
       ParticleDistance pd = new ParticleDistance(otherParticle, d);
@@ -288,36 +287,36 @@ class Particle {
   void checkSector() {
     
     int x = floor(this.position.x / (width / 3));
-    int y = floor(this.position.x / (width / 3));
+    int y = floor(this.position.y / (height / 3));
     int sector = -1;
     
-    if (x == 0 && y == 0)
+    if (x <= 0 && y <= 0)
       sector = 0;
-    else if (x == 1 && y == 0)
+    else if (x == 1 && y <= 0)
       sector = 1;
-    else if (x == 2 && y == 0)
+    else if (x >= 2 && y <= 0)
       sector = 2;
-    else if (x == 0 && y == 1)
+    else if (x <= 0 && y == 1)
       sector = 3;
     else if (x == 1 && y == 1)
       sector = 4;
-    else if (x == 2 && y == 1)
+    else if (x >= 2 && y == 1)
       sector = 5;
-    else if (x == 0 && y == 2)
+    else if (x <= 0 && y >= 2)
       sector = 6;
-    else if (x == 1 && y == 2)
+    else if (x == 1 && y >= 2)
       sector = 7;
-    else if (x == 2 && y == 2)
+    else if (x >= 2 && y >= 2)
       sector = 8;
       
-    if (sector == this.sector || sector == -1)
+    if (sector == this.sector)
       return;
-    else
+    else {
       setSector(sector);
+    }
   }
   
   void setSector(int sector) {
-    
     sectors[this.sector].remove(this);
     sectors[sector].add(this);    
     this.sector = sector;
